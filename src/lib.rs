@@ -2,7 +2,6 @@
 extern crate serde_derive;
 extern crate wasm_bindgen;
 
-use serde_wasm_bindgen::{from_value, to_value};
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 
@@ -19,6 +18,10 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
 
+    #[wasm_bindgen(module="./index")]
+    fn stats_updated(stats:JsValue);
+    
+
     pub type Display;
 
     #[wasm_bindgen(method,structural, js_namespace=ROT)]
@@ -26,10 +29,6 @@ extern "C" {
 
     #[wasm_bindgen(method,structural, js_name= draw, js_namespace=ROT)]
     fn draw_color(this: &Display, x: i32, y: i32, ch: &str, color: &str);
-}
-#[wasm_bindgen(module = "/index.js")]
-extern "C" {
-    fn stats_updated(stats:JsValue);
 }
 
 

@@ -1,5 +1,13 @@
-import { Engine, PlayerCore } from './roguewasm'
+/***
+ * Excerpted from "Programming WebAssembly with Rust",
+ * published by The Pragmatic Bookshelf.
+ * Copyrights apply to this code. It may not be used to create training material,
+ * courses, books, articles, and the like. Contact us if you are in doubt.
+ * We make no guarantees that this code is fit for any purpose.
+ * Visit http://www.pragmaticprogrammer.com/titles/khrust for more book information.
+***/
 
+import { Engine, PlayerCore } from './roguewasm';
 
 var Game = {
     display: null,
@@ -43,7 +51,9 @@ var Game = {
         this.player = this._createBeing(Player, freeCells); // (3)
         this.enemy = this._createBeing(Checko, freeCells);
     },
-        generateBoxes: function (freeCells) {
+
+
+    generateBoxes: function (freeCells) {
         for (var i = 0; i < 10; i++) {
             var index = Math.floor(ROT.RNG.getUniform() * freeCells.length);
             var key = freeCells.splice(index, 1)[0];
@@ -67,8 +77,8 @@ var Game = {
         console.log("Generating player...");
         this.player = new Player(x, y);
     },
+};
 
-}
 Game._createBeing = function (what, freeCells) {
     var index = Math.floor(ROT.RNG.getUniform() * freeCells.length);
     var key = freeCells.splice(index, 1)[0];
@@ -77,8 +87,10 @@ Game._createBeing = function (what, freeCells) {
     var y = parseInt(parts[1]);
     return new what(x, y);
 }
+
+// Checko the Borrow Checker! Run away!
 var Checko = function (x, y) {
-    this._core=new PlayerCore(x,y,"B","red",Game.display);
+    this._core = new PlayerCore(x, y, "B", "red", Game.display);
     this._core.draw();
 
     Checko.prototype.act = function () {
@@ -89,7 +101,7 @@ var Checko = function (x, y) {
             return Game.engine.free_cell(x, y);
         }
         var astar = new ROT.Path.AStar(x, y, passableCallback, { topology: 4 });
-        
+
         var path = [];
         var pathCallback = function (x, y) {
             path.push([x, y]);
@@ -97,60 +109,64 @@ var Checko = function (x, y) {
         astar.compute(this._core.x(), this._core.y(), pathCallback);
 
         path.shift();
-
-        if (path.length == 1) {
+        if (path.length <= 1) {
             Game.rotengine.lock();
-            alert("Game over - you were captured by Checko!");
-        }else{
+            alert("Game over - you were captured by the Borrow Checker!!");
+        } else {
             x = path[0][0];
             y = path[0][1];
-            Game.engine.move_enemy(this._core, x, y);
+            Game.engine.move_player(this._core, x, y);
         }
     }
 }
+
 var Player = function (x, y) {
-    this._core = new PlayerCore(x, y, '@', 'player', Game.display);
-   this._core.draw();
+    this._core = new PlayerCore(x, y, "@", "#ff0", Game.display);
+    this._core.draw();
 }
+
 Player.prototype.act = function () {
     Game.rotengine.lock();
     window.addEventListener("keydown", this);
 }
+
 Player.prototype.handleEvent = function (e) {
-    var KeyMap = {};
-    KeyMap[38] = 0;
-    KeyMap[33] = 1;
-    KeyMap[39] = 2;
-    KeyMap[34] = 3;
-    KeyMap[40] = 4;
-    KeyMap[35] = 5;
-    KeyMap[37] = 6;
-    KeyMap[36] = 7;
+    var keyMap = {};
+    keyMap[38] = 0;
+    keyMap[33] = 1;
+    keyMap[39] = 2;
+    keyMap[34] = 3;
+    keyMap[40] = 4;
+    keyMap[35] = 5;
+    keyMap[37] = 6;
+    keyMap[36] = 7;
 
     var code = e.keyCode;
-
 
     if (code == 13 || code == 32) {
         Game.engine.open_box(this._core, this._core.x(), this._core.y());
         return;
     }
-    if(!(code in KeyMap)) { return; }
 
-    var dir = ROT.DIRS[8][KeyMap[code]];
+    /* one of numpad directions? */
+    if (!(code in keyMap)) { return; }
 
+    /* is there a free space? */
+    var dir = ROT.DIRS[8][keyMap[code]];
     var newX = this._core.x() + dir[0];
     var newY = this._core.y() + dir[1];
-    
-    if (!Game.engine.free_cell(newX, newY)) { return; }
+
+    if (!Game.engine.free_cell(newX, newY)) { return; };
 
     Game.engine.move_player(this._core, newX, newY);
     window.removeEventListener("keydown", this);
     Game.rotengine.unlock();
-
 }
 
 Player.prototype.getX = function () { return this._core.x(); }
+
 Player.prototype.getY = function () { return this._core.y(); }
+
 Game.init();
 
 export function stats_updated(stats) {

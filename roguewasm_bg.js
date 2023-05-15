@@ -1,5 +1,3 @@
-import { stats_updated } from './snippets/roguewasm-42f752944a168bbd/index.js';
-
 let wasm;
 export function __wbg_set_wasm(val) {
     wasm = val;
@@ -293,16 +291,16 @@ export function __wbindgen_object_drop_ref(arg0) {
     takeObject(arg0);
 };
 
-export function __wbg_draw_8e7a66b23870be01(arg0, arg1, arg2, arg3, arg4) {
-    getObject(arg0).draw(arg1, arg2, getStringFromWasm0(arg3, arg4));
-};
-
 export function __wbg_alert_29e72f16952538bc(arg0, arg1) {
     alert(getStringFromWasm0(arg0, arg1));
 };
 
-export function __wbg_statsupdated_d142510794293d34(arg0) {
+export function __wbg_statsupdated_a60a97046096ba26(arg0) {
     stats_updated(takeObject(arg0));
+};
+
+export function __wbg_draw_8e7a66b23870be01(arg0, arg1, arg2, arg3, arg4) {
+    getObject(arg0).draw(arg1, arg2, getStringFromWasm0(arg3, arg4));
 };
 
 export function __wbg_draw_08a30a76a54265c7(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
